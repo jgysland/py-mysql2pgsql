@@ -26,7 +26,7 @@ class PostgresWriter(object):
         """
         """
         if column.get('auto_increment', None):
-            return 'integer DEFAULT nextval(\'%s_%s_seq\'::regclass) NOT NULL' % (
+            return 'integer DEFAULT nextval(\'seq_%s_%s\'::regclass) NOT NULL' % (
                    column['table_name'], column['name'])
 
         null = "" if column['null'] else " NOT NULL"
@@ -178,7 +178,7 @@ class PostgresWriter(object):
         serial_key_sql = []
         table_sql = []
         if serial_key:
-            serial_key_seq = '%s_%s_seq' % (table.name, serial_key)
+            serial_key_seq = 'seq_%s_%s' % (table.name, serial_key)
             serial_key_sql.append('DROP SEQUENCE IF EXISTS %s CASCADE;' % serial_key_seq)
             serial_key_sql.append("""CREATE SEQUENCE %s INCREMENT BY 1
                                   NO MAXVALUE NO MINVALUE CACHE 1;""" % serial_key_seq)
@@ -201,7 +201,7 @@ class PostgresWriter(object):
             if 'primary' in index:
                 continue
             unique = 'UNIQUE ' if index.get('unique', None) else ''
-            index_name = '%s_%s' % (table.name, '_'.join(index['columns']))
+            index_name = 'idx_%s_%s' % (table.name, '_'.join(index['columns']))
             index_sql.append('DROP INDEX IF EXISTS "%s" CASCADE;' % index_name)
             index_sql.append('CREATE %(unique)sINDEX "%(index_name)s" ON "%(table_name)s" (%(column_names)s);' % {
                     'unique': unique,

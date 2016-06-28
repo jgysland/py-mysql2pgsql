@@ -197,7 +197,7 @@ class MysqlReader(object):
 
     @property
     def tables(self):
-        return (self.Table(self, t[0]) for t in self.db.list_tables())
+        return (t[0] for t in self.db.list_tables())
 
     def read(self, table):
         return self.db.query(table.query_for, large=True)
