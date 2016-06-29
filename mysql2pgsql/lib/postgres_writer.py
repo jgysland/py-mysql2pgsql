@@ -75,12 +75,14 @@ class PostgresWriter(object):
             elif column['type'] == 'date':
                 default = None
                 return default, 'date'
-            elif column['type'] == 'timestamp':
-                if "CURRENT_TIMESTAMP" in column['default']:
+            elif re.match(r'timestamp[(\(\d+\))]{0,1}', column['type']):
+                if not column['default']:
+                    default = None
+                elif "CURRENT_TIMESTAMP" in column['default']:
                     default = ' DEFAULT CURRENT_TIMESTAMP'
-                if "0000-00-00 00:00" in  column['default']:
+                elif "0000-00-00 00:00" in  column['default']:
                     default = " DEFAULT '1970-01-01 00:00'"
-                if "0000-00-00 00:00:00" in column['default']:
+                elif "0000-00-00 00:00:00" in column['default']:
                     default = " DEFAULT '1970-01-01 00:00:00'"
                 return default, 'timestamp without time zone'
             elif column['type'] == 'time':
